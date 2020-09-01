@@ -47,7 +47,7 @@ class Proccess
   def path
     line = @vertex_map.size-1
     column = @vertex_map.first.size-1
-    vertex = @vertex_map[4][4]
+    vertex = @vertex_map[line][column]
 
     path = [vertex.position]
 
@@ -62,7 +62,7 @@ class Proccess
       column = next_quadrant[1]
     end
 
-    path.push(@vertex_map[0][0].position)
+    # path.push(@vertex_map[0][0].position)
 
     path.reverse.join(";")
   end
