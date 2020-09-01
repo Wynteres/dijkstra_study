@@ -1,12 +1,23 @@
 class Vertex
-  attr_accessor :neighboors, :distance_from_start
+  attr_accessor :neighboors, :distance_from_start, :nearest_vertex
 
   attr_reader :terrain_dificulty
 
-  def initialize(terrain_dificulty: , distance_from_start: Float::INFINITY)
+  def initialize(terrain_dificulty: , distance_from_start: Float::INFINITY, row:, column:)
     @neighboors = []
     @distance_from_start = distance_from_start
     @terrain_dificulty = terrain_dificulty
+    @row = row
+    @column = column
+  end
+
+  def nearest_vertex_distance
+    return Float::INFINITY if nearest_vertex.nil?
+    nearest_vertex.distance_from_start
+  end
+
+  def position
+    "#{@row},#{@column}"
   end
 end
 
@@ -27,14 +38,34 @@ class Proccess
   end
 
   def call(map)
+    @vertex_map = []
     populate_vertex_map(map)
     generate_edges
     shortest_path
   end
 
-  def populate_vertex_map(positions_map)
-    @vertex_map = []
+  def path
+    line = @vertex_map.size-1
+    column = @vertex_map.first.size-1
+    vertex = @vertex_map[4][4]
 
+    path = [vertex.position]
+
+    while !line.zero? && !column.zero?
+      search_quadrants = [[line-1, column],[line-1, column-1],[line, column-1]]
+
+      next_quadrant = search_quadrants.sort_by { |quadrant| @vertex_map[quadrant[0]][quadrant[1]]&.distance_from_start }.first
+      vertex = @vertex_map[next_quadrant[0]][next_quadrant[1]]
+      path.push(vertex.position) unless vertex.nil?
+
+      line = next_quadrant[0]
+      column = next_quadrant[1]
+    end
+
+    path
+  end
+
+  def populate_vertex_map(positions_map)
     positions_map.each_with_index do |row, row_index|
       new_row = []
       row.each_with_index do |terrain_dificulty, item_index|
@@ -42,11 +73,19 @@ class Proccess
           new_row.push(
             Vertex.new(
               terrain_dificulty: terrain_dificulty,
-              distance_from_start: 0
+              distance_from_start: 0,
+              row: row_index,
+              column: item_index
             )
           )
         else
-          new_row.push(Vertex.new(terrain_dificulty: terrain_dificulty))
+          new_row.push(
+            Vertex.new(
+              terrain_dificulty: terrain_dificulty,
+              row: row_index,
+              column: item_index
+            )
+          )
         end
       end
       @vertex_map.push(new_row)
@@ -98,6 +137,9 @@ class Proccess
           relative_distance = edge.distance + vertex.distance_from_start
           if relative_distance < edge.vertex.distance_from_start
             edge.vertex.distance_from_start = relative_distance
+          end
+          if vertex.nearest_vertex_distance > relative_distance
+            vertex.nearest_vertex = edge.vertex
           end
         end
       end

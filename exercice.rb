@@ -8,7 +8,7 @@ graph = {
     b: 2
   },
   a: {
-    end: 1
+    end: 5
   },
   b: {
     a: 3,
@@ -18,8 +18,8 @@ graph = {
 }
 
 costs = {
-  a: 6,
-  b: 2,
+  a: 0,
+  b: -1,
   end: @infinity
 }
 
@@ -46,7 +46,7 @@ def find_in_cheapest_cost(costs)
   cheapest_cost_node
 end
 
-node = find_in_cheapest_cost(costs) # encontra o custo mais baixonque ainda não foi processado
+node = find_in_cheapest_cost(costs) # encontra o custo mais baixo que ainda não foi processado
 
 until node.nil? # caso todos os vértices tenham sido processados, esse laço será finalizado
   cost = costs[node]
