@@ -62,7 +62,9 @@ class Proccess
       column = next_quadrant[1]
     end
 
-    path
+    path.push(@vertex_map[0][0].position)
+
+    path.reverse.join(";")
   end
 
   def populate_vertex_map(positions_map)
